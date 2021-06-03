@@ -4,7 +4,7 @@ namespace error;
 
 use error\Email;
 
-class youngHtmlEmailHandle extends Handle
+class myHtmlEmailHandle extends Handle
 {
     public function send($data)
     {
