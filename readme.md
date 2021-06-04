@@ -16,11 +16,13 @@ error\Error::register();
 
 默认错误为输出到终端，如果需要直接发邮件请添加如下代码  
 
+```
+
 error\Error::setExceptionHandler('error\myHtmlEmailHandle');  
 
-并且将 myHtmlEmailHandle.php 中下面变量改成自己的邮件配置 请参考 https://www.php.cn/jishu/php/414138.html 获取自己的 send_auth;
+//并且将 myHtmlEmailHandle.php 中下面变量改成自己的邮件配置 请参考 https://www.php.cn/jishu/php/414138.html 获取自己的 send_auth;
 
-```
+
 $smtp_host = 'smtp.qq.com';  
 
 $send_to = "XXX@XX.com";   
