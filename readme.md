@@ -4,7 +4,7 @@
 在需要的地方引入  
 
 ```
-include  __DIR__ . '/cli/class/autoload.php';  
+include  __DIR__ . '/autoload.php';  
 
 error\Error::register();   
 ```
