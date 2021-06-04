@@ -3,9 +3,12 @@
 
 在需要的地方引入  
 
+```
 include  __DIR__ . '/cli/class/autoload.php';  
 
 error\Error::register();   
+```
+
 
 如果要自定义错误输出 就 写一个类 继承 Handle 并实现 send() 方法即可，
 
@@ -17,17 +20,23 @@ error\Error::setExceptionHandler('error\myHtmlEmailHandle');
 
 并且将 myHtmlEmailHandle.php 中下面变量改成自己的邮件配置 请参考 https://www.php.cn/jishu/php/414138.html 获取自己的 send_auth;
 
+```
 $smtp_host = 'smtp.qq.com';  
 
 $send_to = "XXX@XX.com";   
 
 $send_auth = 'XXXX';    
 
-$who_send = "XXX@XX.com";    
+$who_send = "XXX@XX.com";  
+
+```
+
 
 如果希望统计，某个错误出现错误次数，可以利用redis 来计算  
 
-例如:   
+例如: 
+
+```
 
 $thisErrorCount = $redis->hincrby('phpError'.date('Y-m-d'),md5($data['file'].$data['line'].$data['message']));  
 
@@ -36,10 +45,14 @@ $redis->expipe('phpError'.date('Y-m-d'),24*3600);
 
 echo $data['file'].$data['line'].$data['message']. '今天出现' . $thisErrorCount .'次';  
 
+```
+
 
 
 原理介绍  
 
+
+```
 error\Error::register();  里面调用了3个方法，理解了这3个函数就能理解错误是如何处理的了  
 
 set_error_handler();
@@ -47,6 +60,8 @@ set_error_handler();
 set_exception_handler();
 
 register_shutdown_function();
+```
+
 
 
 1.set_error_handler 这个是设置自己的异常处理函数，这个不是重点，重点是后面2个函数
@@ -57,6 +72,7 @@ register_shutdown_function();
 
 引发 这个注册函数错误例子
 
+```
 <?php  
 function myErrorHandler($errno, $errstr, $errfile, $errline) {  
      echo "<b>Custom error:</b> [$errno] $errstr<br>";  
@@ -67,7 +83,9 @@ function myErrorHandler($errno, $errstr, $errfile, $errline) {
 set_error_handler("myErrorHandler");  
 
 trigger_error("A custom error has been triggered");  
- 
+```
+
+
 
 //set_error_handler 捕获自己通过 trigger_error 抛出的错误好像略显无聊  
 
@@ -79,6 +97,7 @@ trigger_error("A custom error has been triggered");
 
 例子：
 
+```
 function myException($exception)
 {
 
@@ -89,6 +108,10 @@ echo "<b>Exception:</b> " , $exception->getMessage();
 set_exception_handler('myException');
 
 throw new Exception('Uncaught Exception occurred');
+
+```
+
+
 
 上面代码的输出如下所示：
 
@@ -110,6 +133,7 @@ Exception: Uncaught Exception occurred
 你仔细阅读我代码 register_shutdown_function 注册函数里面写的内容，
 会发现它又将错误通过异常抛出，这个时候 set_exception_handler 注册的异常处理函数来接管错误处理
 
+```
 register_shutdown_function([__CLASS__, 'appShutdown']);
 
  public static function appShutdown()
@@ -121,6 +145,8 @@ register_shutdown_function([__CLASS__, 'appShutdown']);
             ));
         }
     }
+```
+
 
 
 
@@ -138,6 +164,7 @@ register_shutdown_function([__CLASS__, 'appShutdown']);
 
 5.2 紧接着引入需要的错误处理函数
 
+```
 include  __DIR__ . '/cli/class/autoload.php';
 
 error\Error::register(); //这个只在终端输出错误
@@ -157,6 +184,8 @@ $who_send = "XXX@XX.com";
 //其实可以改一下代码，写一个初始化相关变量，掉用的时候直接使用，这样就能灵活发各种邮箱的邮件，有想法的自己改吧，改动也不大
 
 //不过觉得，有这个功夫还不如直接写一个新的类，需要发哪个邮箱就用哪个类
+```
+
 
 
 
@@ -171,6 +200,7 @@ $who_send = "XXX@XX.com";
 
 假设名称为 runSomeJob.php
 
+```
 <?php
 
 error_reporting(E_ERROR | E_PARSE );
@@ -192,6 +222,11 @@ $someService->test();
 
 someService.php 内容如下:
 
+```
+
+
+
+```
 <?php
 
 /**
@@ -207,6 +242,8 @@ class someService
     }
 }
 
+```
+
 
 ====== someService.php 结束
 
@@ -215,6 +252,7 @@ class someService
 
 如果把 runSomeJob.php 改成如下就不能被捕获了 E_PARSE 错误
 
+```
 <?php
 error_reporting(E_ERROR | E_PARSE );
 
@@ -225,6 +263,8 @@ error\Error::register();
 //error\Error::setExceptionHandler('error\myHtmlEmailHandle');
 
 $a++-;
+```
+
 
 更多资料请阅读
 
